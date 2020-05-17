@@ -30,7 +30,7 @@
 + utils/          contains external libraries
     - utils/tight_subplot/:             used for creating figures with narrow margins
 
-# Running the experiments
+# Instruction to run the experiments
 
 ## Configurations
 
