@@ -1,7 +1,7 @@
 Description of files
 ====================
 
-func/main/      contains the core functions
+#func/main/      contains the core functions
     portcreate.m                    function to create a portfolio structure from the specification of tranded and non-traded derivatives
     portsubset.m                    function to create a portfolio structure as a subset of another portfolio structure
     port2cpwl.m                     function to convert a portfolio structure and the corresponding weights into a continuous piece-wise affine (linear) function
