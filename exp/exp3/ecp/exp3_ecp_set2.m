@@ -1,5 +1,3 @@
-% Script to run Experiment 3 with the ECP algorithm
-
 load('exp/exp3/exp3.mat');
 
 [port, ~] = portcreate(conf);
@@ -70,5 +68,4 @@ for id = 1:strike_num
 end
 compute_time = toc;
 
-save('exp/exp3/rst/ecp.mat');
-
+save('exp/exp3/rst/ecp_set2.mat');

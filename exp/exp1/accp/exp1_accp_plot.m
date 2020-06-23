@@ -1,13 +1,12 @@
-% Script to plot the result of Experiment 1 with the ECP algorithm
-
 load('exp/exp1/exp1.mat');
-dat1 = load('exp/exp1/rst/ecp_set1.mat');
-dat2 = load('exp/exp1/rst/ecp_set2.mat');
-dat3 = load('exp/exp1/rst/ecp_set3.mat');
-dat4 = load('exp/exp1/rst/ecp_set4.mat');
+dat1 = load('exp/exp1/rst/accp_set1.mat');
+dat2 = load('exp/exp1/rst/accp_set2.mat');
+dat3 = load('exp/exp1/rst/accp_set3.mat');
+dat4 = load('exp/exp1/rst/accp_set4.mat');
 
 xx = (0:50) / 5;
 
+for fig_id = 1:2
 figure('Position', [100,100,500,400]);
 [ha, pos] = tight_subplot(1, 1, [0.15, 0.15], [0.08, 0.04], [0.08, 0.02]);
 hold on;
@@ -31,12 +30,21 @@ ru1 = plot(xx, dat1.out_bounds(:, 1), 'LineStyle', '-', ...
     'Color', 'r', 'LineWidth', 1);
 legend([su, rl4, ru4, rl3, ru3, rl2, ru2, rl1, ru1], ...
     'simulated price', ...
-    'robust LB (V)', 'robust UB (V)', ...
-    'robust LB (V+B)', 'robust UB (V+B)', ...
-    'robust LB (V+B+S)', 'robust UB (V+B+S)', ...
-    'robust LB (V+B+S+R)', 'robust UB (V+B+S+R)', ...
+    'LB (V)', 'UB (V)', ...
+    'LB (V+B)', 'UB (V+B)', ...
+    'LB (V+B+S)', 'UB (V+B+S)', ...
+    'LB (V+B+S+R)', 'UB (V+B+S+R)', ...
     'Location', 'northeast');
 legend boxoff
 xlabel('strike');
 ylabel('price');
-title('ECP');
+
+if fig_id == 1
+    title('ACCP');
+else
+    title('Magnified');
+    set(gca, 'XLim', [3, 4.5]);
+    set(gca, 'YLim', [0.4, 1.8]);
+end
+
+end

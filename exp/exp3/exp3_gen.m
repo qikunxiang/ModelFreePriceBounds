@@ -1,5 +1,3 @@
-% Script to generate the necessary data file for Experiment 3
-
 rng(1000);
 
 conf = struct;

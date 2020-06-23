@@ -1,5 +1,3 @@
-% Script to run the second part of Experiment 5
-
 load('exp/exp5/exp5_2.mat');
 
 [port, portlim] = portcreate(conf);
@@ -45,4 +43,4 @@ W = weights{1};
 W(abs(W) < 0.01) = 0;
 W = sparse(W);
 
-save('exp/exp5/rst/accp_set2.mat');
+

@@ -1,10 +1,6 @@
-% Script to run Experiment 3 with the ACCP algorithm
-
 load('exp/exp3/exp3.mat');
 
 [port, ~] = portcreate(conf);
-
-setting = 1;
 
 strike_num = 11;
 
@@ -81,4 +77,4 @@ for id = 1:strike_num
 end
 compute_time = toc;
 
-save('exp/exp3/rst/ecp.mat');
+save('exp/exp3/rst/accp_set2.mat');
