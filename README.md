@@ -42,10 +42,12 @@
 
 + Run exp/exp1/exp1_gen.m to generate the data file.
 + The ECP algorithm:
-++
-+ Run exp/exp1/accp/exp1_accp_all.m and exp/exp1/ecp/exp1_ecp_all.m to generate output files.
-+ Run exp/exp1/exp1_examine.m to compare the output. 
-+ Run exp/exp1/accp/exp1_accp_plot.m and exp/exp1/ecp/exp1_ecp_plot.m to plot the output.
+- Run exp/exp1/ecp/exp1_ecp_all.m to generate output files.
+- Run exp/exp1/ecp/exp1_ecp_plot.m to plot the output.
++ The ACCP algorithm:
+- Run exp/exp1/accp/exp1_accp_all.m to generate output files.
+- Run exp/exp1/accp/exp1_accp_plot.m to plot the output.
++ Run exp/exp1/exp1_examine.m to compare the output of two algorithms. 
 
 
 ## Experiment 2
