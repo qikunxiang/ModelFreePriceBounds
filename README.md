@@ -40,33 +40,33 @@
 
 ## Experiment 1
 
-+ First, run exp/exp1/robust_exp1_gen.m to generate the data file.
-+ Then, run exp/exp1/accp/robust_exp1_accp_all.m and exp/exp1/ecp/robust_exp1_ecp_all.m to generate output files.
-+ Finally, run exp/exp1/robust_exp1_examine.m to compare the output, run exp/exp1/accp/robust_exp1_accp_plot.m and exp/exp1/ecp/robust_exp1_ecp_plot.m to plot the output.
++ Run exp/exp1/exp1_gen.m to generate the data file.
++ Run exp/exp1/accp/exp1_accp_all.m and exp/exp1/ecp/exp1_ecp_all.m to generate output files.
++ Run exp/exp1/exp1_examine.m to compare the output, run exp/exp1/accp/exp1_accp_plot.m and exp/exp1/ecp/exp1_ecp_plot.m to plot the output.
 
 
 ## Experiment 2
 
-+ First, run exp/exp2/robust_exp2_gen.m to generate the data file.
-+ Then, run exp/exp2/accp/robust_exp2_accp_all.m and exp/exp2/ecp/robust_exp2_ecp_all.m to generate output files.
-+ Finally, run exp/exp2/robust_exp2_examine.m to compare the output, run exp/exp2/accp/robust_exp2_accp_plot.m and exp/exp2/ecp/robust_exp2_ecp_plot.m to plot the output.
++ Run exp/exp2/exp2_gen.m to generate the data file.
++ Run exp/exp2/accp/exp2_accp_all.m and exp/exp2/ecp/exp2_ecp_all.m to generate output files.
++ Run exp/exp2/exp2_examine.m to compare the output, run exp/exp2/accp/exp2_accp_plot.m and exp/exp2/ecp/exp2_ecp_plot.m to plot the output.
 
 
 ## Experiment 3
 
-+ First, run exp/exp3/robust_exp3_gen.m to generate the data file.
-+ Then, run exp/exp3/accp/robust_exp3_accp.m and exp/exp3/ecp/robust_exp3_ecp.m to generate output files.
-+ Finally, run exp/exp3/robust_exp3_examine.m to compare the output, run exp/exp3/accp/robust_exp3_accp_plot.m and exp/exp3/ecp/robust_exp3_ecp_plot.m to plot the output.
++ Run exp/exp3/exp3_gen.m to generate the data file.
++ Run exp/exp3/accp/exp3_accp_set1.m, exp/exp3/accp/exp3_accp_set2.m, exp/exp3/accp/exp3_ecp_set1.m and exp/exp3/ecp/exp3_ecp_set2.m to generate output files.
++ Run exp/exp3/exp3_examine.m to compare the output, run exp/exp3/accp/exp3_accp_plot.m and exp/exp3/ecp/exp3_ecp_plot.m to plot the output.
 
 
 ## Experiment 4
 
-+ First, run exp/exp4/robust_exp4_gen.m to generate the data file.
-+ Then, run exp/exp1/ecp/robust_exp4_ecp.m to generate the output file.
-+ Finally, run exp/exp4/ecp/robust_exp4_ecp_plot.m to plot the output.
++ Run exp/exp4/exp4_gen.m to generate the data file.
++ Run exp/exp1/ecp/exp4_ecp.m to generate the output file.
++ Run exp/exp4/ecp/exp4_ecp_plot.m to plot the output.
 
 
 ## Experiment 5
 
-+ First, run exp/exp5/robust_exp5_gen.m to generate the data file (must run Experiment 2 first).
-+ Then, run exp/exp5/accp/robust_exp5_accp1.m and exp/exp5/accp/robust_exp5_accp1.m to generate output files.
++ Run exp/exp5/exp5_gen.m to generate the data file (must run Experiment 2 first).
++ Run exp/exp5/accp/exp5_accp_set1.m and exp/exp5/accp/exp5_accp_set2.m to generate output files.
