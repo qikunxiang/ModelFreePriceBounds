@@ -41,15 +41,19 @@
 ## Experiment 1
 
 + Run exp/exp1/exp1_gen.m to generate the data file.
++ The ECP algorithm:
+++
 + Run exp/exp1/accp/exp1_accp_all.m and exp/exp1/ecp/exp1_ecp_all.m to generate output files.
-+ Run exp/exp1/exp1_examine.m to compare the output, run exp/exp1/accp/exp1_accp_plot.m and exp/exp1/ecp/exp1_ecp_plot.m to plot the output.
++ Run exp/exp1/exp1_examine.m to compare the output. 
++ Run exp/exp1/accp/exp1_accp_plot.m and exp/exp1/ecp/exp1_ecp_plot.m to plot the output.
 
 
 ## Experiment 2
 
 + Run exp/exp2/exp2_gen.m to generate the data file.
 + Run exp/exp2/accp/exp2_accp_all.m and exp/exp2/ecp/exp2_ecp_all.m to generate output files.
-+ Run exp/exp2/exp2_examine.m to compare the output, run exp/exp2/accp/exp2_accp_plot.m and exp/exp2/ecp/exp2_ecp_plot.m to plot the output.
++ Run exp/exp2/exp2_examine.m to compare the output. 
++ Run exp/exp2/accp/exp2_accp_plot.m and exp/exp2/ecp/exp2_ecp_plot.m to plot the output.
 
 
 ## Experiment 3
