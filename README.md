@@ -53,22 +53,31 @@
 ## Experiment 2
 
 + Run exp/exp2/exp2_gen.m to generate the data file.
-+ Run exp/exp2/accp/exp2_accp_all.m and exp/exp2/ecp/exp2_ecp_all.m to generate output files.
-+ Run exp/exp2/exp2_examine.m to compare the output. 
-+ Run exp/exp2/accp/exp2_accp_plot.m and exp/exp2/ecp/exp2_ecp_plot.m to plot the output.
++ The ECP algorithm:
+    - Run exp/exp2/ecp/exp2_ecp_all.m to generate output files.
+    - Run exp/exp2/ecp/exp2_ecp_plot.m to plot the output.
++ The ACCP algorithm:
+    - Run exp/exp2/accp/exp2_accp_all.m to generate output files.
+    - Run exp/exp2/accp/exp2_accp_plot.m to plot the output.
++ Run exp/exp2/exp2_examine.m to compare the output of two algorithms. 
 
 
 ## Experiment 3
 
 + Run exp/exp3/exp3_gen.m to generate the data file.
-+ Run exp/exp3/accp/exp3_accp_set1.m, exp/exp3/accp/exp3_accp_set2.m, exp/exp3/accp/exp3_ecp_set1.m and exp/exp3/ecp/exp3_ecp_set2.m to generate output files.
-+ Run exp/exp3/exp3_examine.m to compare the output, run exp/exp3/accp/exp3_accp_plot.m and exp/exp3/ecp/exp3_ecp_plot.m to plot the output.
++ The ECP algorithm:
+    - Run exp/exp3/ecp/exp3_ecp_set1.m and exp/exp3/ecp/exp3_ecp_set2.m to generate output files.
+    - Run exp/exp3/ecp/exp3_ecp_plot.m to plot the output.
++ The ACCP algorithm:
+    - Run exp/exp3/accp/exp3_accp_set1.m and exp/exp3/accp/exp3_accp_set2.m to generate output files.
+    - Run exp/exp3/accp/exp3_accp_plot.m to plot the output.
++ Run exp/exp3/exp3_examine.m to compare the output of two algorithms.
 
 
 ## Experiment 4
 
 + Run exp/exp4/exp4_gen.m to generate the data file.
-+ Run exp/exp1/ecp/exp4_ecp.m to generate the output file.
++ Run exp/exp4/ecp/exp4_ecp.m to generate the output file.
 + Run exp/exp4/ecp/exp4_ecp_plot.m to plot the output.
 
 
