@@ -84,4 +84,4 @@
 ## Experiment 5
 
 + Run exp/exp5/exp5_gen.m to generate the data file (must run Experiment 2 first).
-+ Run exp/exp5/accp/exp5_accp_set1.m and exp/exp5/accp/exp5_accp_set2.m to generate output files.
++ Run exp/exp5/accp/exp5_accp_set1.m and exp/exp5/accp/exp5_accp_set2.m to view the output.
