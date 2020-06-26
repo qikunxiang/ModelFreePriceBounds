@@ -1,6 +1,7 @@
 # Model-free bounds for multi-asset options using option-implied information and their exact computation
 
-Article link (arXiV): https://arxiv.org/abs/2006.14288
++ By Ariel Neufeld, Antonis Papapantoleon and Qikun Xiang
++ Article link (arXiV): https://arxiv.org/abs/2006.14288
 
 # Description of files
 
