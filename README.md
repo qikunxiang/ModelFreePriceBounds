@@ -1,3 +1,7 @@
+# Model-free bounds for multi-asset options using option-implied information and their exact computation
+
+Article link (arXiV): https://arxiv.org/abs/2006.14288
+
 # Description of files
 
 + func/main/      contains the core functions  
