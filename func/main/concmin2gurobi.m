@@ -28,7 +28,7 @@ n_with_aux = size(A, 2);
 
 % a large number as heuristic upper bound of x
 if ~exist('x_ub', 'var') || isempty(x_ub)
-    x_ub = 100;
+    x_ub = 100 * ones(n, 1);
 end
 
 % indicator of whether to enforce this upper bound
@@ -136,12 +136,12 @@ for hpid = 1:hp_count
     milp_hp_beq(hpid) = -hp_b(hpid);
     
     % first inequality, characterizing z
-    cur_M_u = max(1, sum(max(hp_A(hpid, :), 0)) * x_ub + hp_b(hpid));
+    cur_M_u = max(1, sum(max(hp_A(hpid, :), 0) .* x_ub') + hp_b(hpid));
     milp_hp_A(2 * hpid - 1, hp_z_index(hpid)) = 1;
     milp_hp_A(2 * hpid - 1, hp_y_index(hpid)) = cur_M_u;
     milp_hp_b(2 * hpid - 1) = cur_M_u;
     % second inequality, characterizing s
-    cur_M_l = max(1, sum(max(-hp_A(hpid, :), 0)) * x_ub - hp_b(hpid));
+    cur_M_l = max(1, sum(max(-hp_A(hpid, :), 0) .* x_ub') - hp_b(hpid));
     milp_hp_A(2 * hpid, hp_s_index(hpid)) = 1;
     milp_hp_A(2 * hpid, hp_y_index(hpid)) = -cur_M_l;
     milp_hp_b(2 * hpid) = 0;
@@ -182,7 +182,7 @@ for grpid = 1:gen_count
     
     for gidx = 1:cur_grp_size
         cur_M(gidx) = max(1, max(sum(max(gen_A{grpid} ...
-            - gen_A{grpid}(gidx, :), 0) * x_ub, 2) ...
+            - gen_A{grpid}(gidx, :), 0) .* x_ub', 2) ...
             + gen_b{grpid} - gen_b{grpid}(gidx)));
     end
     

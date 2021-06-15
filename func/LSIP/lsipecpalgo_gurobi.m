@@ -22,6 +22,10 @@ function [rprice, rprice_lb, weight_vec, output] = lsipecpalgo_gurobi( ...
 %           init_x: (optional) initial set of x, each column is one set of
 %               x
 %           init_rprice_lb: initial lower bound of the robust price
+%           x_ub: upper bounds on the asset prices used in the formulation
+%                 of the MILP
+%           switch_to_simplex: boolean indicating whether to switch to dual
+%               simplex method once the lower bound has been updated
 %           display: boolean indicating whether to display Gurobi output
 % Outputs:
 %       rprice: robust upper bound on the price of the portfolio
@@ -57,6 +61,14 @@ end
 
 if ~isfield(options, 'init_rprice_lb')
     options.init_rprice_lb = -100;
+end
+
+if ~isfield(options, 'x_ub')
+    options.x_ub = 100 * ones(n, 1);
+end
+
+if ~isfield(options, 'switch_to_simplex')
+    options.switch_to_simplex = false;
 end
 
 if ~isfield(options, 'display')
@@ -117,6 +129,8 @@ output.init_lp_model = lp_model;
 lp_params = struct;
 lp_params.FeasibilityTol = 1e-6;
 lp_params.OptimalityTol = 1e-5;
+
+% start with barrier method, later may switch to dual simplex method
 lp_params.Method = 2;
 
 if options.display
@@ -165,6 +179,11 @@ rprice_lb = lp_output.objval;
 w = lp_output.x(1:coef_num);
 weight_vec = weightcollapse(w, repl, weight_fixed, has_spread);
 
+if isfield(lp_output, 'cbasis') && isfield(lp_output, 'vbasis')
+    lp_model.cbasis = lp_output.cbasis;
+    lp_model.vbasis = lp_output.vbasis;
+end
+
 % iteratively introduce new constraints until the violation is below the
 % tolerance
 rprice = inf;
@@ -177,7 +196,7 @@ while true
     param = port2cpwl(port, weight_vec);
     [cparam, A, b] = cpwl2concmin(param);
     
-    [model, params] = concmin2gurobi(cparam, A, b, 100, true);
+    [model, params] = concmin2gurobi(cparam, A, b, options.x_ub, true);
     
     if options.display
         params.OutputFlag = 1;
@@ -215,6 +234,10 @@ while true
         sparse(size(x_feas, 2), aux_num)];
     lp_model.rhs = [lp_model.rhs; -newb_x];
     
+    if isfield(lp_model, 'cbasis')
+        lp_model.cbasis = [lp_model.cbasis; zeros(size(x_feas, 2), 1)];
+    end
+    
     if mod(iter, options.drop_iter) == 0
         % drop possibly redundant constraints
         cut_filter_list = cpwleval(x_agg, param)' <= options.drop_thres;
@@ -222,6 +245,17 @@ while true
         x_agg = x_agg(:, cut_filter_list);
         lp_model.A = lp_model.A(filter_list, :);
         lp_model.rhs = lp_model.rhs(filter_list);
+        
+        if isfield(lp_model, 'cbasis')
+            lp_model.cbasis = lp_model.cbasis(filter_list);
+        end
+    end
+    
+    if rprice_lb - options.init_rprice_lb > options.tol ...
+            && options.switch_to_simplex
+        % if the current lower bound is above the initial one, switch the
+        % algorithm in the LP solver to the dual simplex method
+        lp_params.Method = 1;
     end
     
     lp_output = gurobi(lp_model, lp_params);
@@ -262,6 +296,12 @@ while true
     w = lp_output.x(1:coef_num);
     
     weight_vec = weightcollapse(w, repl, weight_fixed, has_spread);
+    
+    if isfield(lp_output, 'cbasis') && isfield(lp_output, 'vbasis')
+        lp_model.cbasis = lp_output.cbasis;
+        lp_model.vbasis = lp_output.vbasis;
+    end
+    
     iter = iter + 1;
 end
 

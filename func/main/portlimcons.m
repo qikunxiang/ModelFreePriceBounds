@@ -60,12 +60,12 @@ counter = ones(counter_num, 1);
 total_num = prod(counter_max);
 
 if isempty(counter_max)
-    cons_C = aff_C;
+    cons_C = sparse(aff_C);
     cons_D = [];
     return;
 end
 
-if total_num > 1e5
+if total_num > inf
     error('problem size is too large');
 end
 
@@ -108,8 +108,7 @@ while true
     cur_D = cur_D ./ max(abs(cur_D), 1);
     col_num = size(cur_D, 2);
     
-    % simplify the set of vectors and check whether the dual cone has empty
-    % interior
+    % simplify the set of vectors
     empty_int = false;
     next_col_index = 1;
     new_D = zeros(portlim.n, col_num);
@@ -123,8 +122,6 @@ while true
                 break;
             end
             
-            % if both v and -v are in the set, then the dual cone has empty
-            % interior
             if all(cur_col + new_D(:, j) == 0)
                 dup = true;
                 empty_int = true;
@@ -133,21 +130,16 @@ while true
         end
         
         if empty_int
-            % if the dual cone has been found to have empty interior, there
-            % is no need to check the remaining vectors
             break;
         end
         
         if ~dup
-            % otherwise, add this vector to the set
             new_D(:, next_col_index) = cur_col;
             next_col_index = next_col_index + 1;
         end
     end
     
     if empty_int
-        % if the dual cone has been determined to have empty interior,
-        % there is no need to run the LP
         if all(counter == counter_max)
             break;
         end
@@ -156,7 +148,7 @@ while true
     
     new_D = new_D(:, 1:next_col_index - 1);
     
-    % run LP to determine if the dual cone has empty interior
+    % run LP to determine if the intersection of the dual cones is empty
     lp_A = sparse(new_D);
     lp_b = sparse(portlim.n, 1);
     lp_lb = zeros(size(new_D, 2), 1);
@@ -169,7 +161,8 @@ while true
     lp_count = lp_count + 1;
     
     if exitflag < 0
-        % the dual cone has empty interior, aggregate the constraints
+        % the intersection of the dual cones is empty, aggregate the
+        % constraints
         cons_C_cell{next_index} = sparse(cur_C);
         cons_D_cell{next_index} = sparse(new_D);
         
@@ -184,8 +177,7 @@ end
 cons_C = vertcat(cons_C_cell{1:next_index - 1});
 cons_D = blkdiag(cons_D_cell{1:next_index - 1});
 
-% round-off very small entries to improve the numerical condition of
-% subsequent LP problems
+% remove very small entries to prevent numerical issues
 cons_C = round(cons_C, 4);
 cons_D = round(cons_D, 4);
 

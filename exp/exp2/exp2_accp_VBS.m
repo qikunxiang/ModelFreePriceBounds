@@ -1,4 +1,4 @@
-load('exp/exp3/exp3.mat');
+load('exp/exp2/exp2.mat');
 
 [port, ~] = portcreate(conf);
 
@@ -77,4 +77,4 @@ for id = 1:strike_num
 end
 compute_time = toc;
 
-save('exp/exp3/rst/accp_set1.mat');
+save('exp/exp2/rst/accp_V+B+S.mat');

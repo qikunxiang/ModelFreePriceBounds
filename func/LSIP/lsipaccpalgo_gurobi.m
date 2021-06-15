@@ -14,9 +14,11 @@ function [rprice_ub, rprice_lb, weight_opt, output]...
 %       options: structure containing options
 %           tol: positive tolerance
 %           init_x: (optional) initial set of x, each column is one set of
-%               x
+%                   x
 %           init_rprice_lb: initial lower bound of the robust price
 %           init_rprice_ub: initial upper bound of the robust price
+%           x_ub: upper bounds on the asset prices used in the formulation
+%                 of the MILP
 %           radius_factor: a factor for scaling radius
 %           cut_lb_factor: a factor for adjusting cut w.r.t. lower bound
 %           milp_gap: the relative gap tolerance used when solving MILP
@@ -31,8 +33,14 @@ function [rprice_ub, rprice_lb, weight_opt, output]...
 %           milp_count: number of MILP solved
 %           x: all feasibility cuts
 
+n = port.n;
+
 if ~isfield(options, 'tol')
     options.tol = 1e-3;
+end
+
+if ~isfield(options, 'x_ub')
+    options.x_ub = 100 * ones(n, 1);
 end
 
 if ~isfield(options, 'radius_factor')
@@ -53,8 +61,6 @@ end
 
 % whether bid-ask spread is considered
 has_spread = length(price_bounds) > port.m;
-
-n = port.n;
 
 if has_spread
     coef_num = sum(~repl) * 2 - 1;
@@ -163,6 +169,7 @@ while rprice_ub - rprice_lb > options.tol
         lb_model.obj = price_bounds;
         lb_model.A = [A_bounds; A_feas(active_list, :)];
         lb_model.rhs = [b_bounds; b_feas(active_list)];
+        lb_model.lb = -inf(coef_num, 1);
         lb_params = struct;
         lb_params.Method = 2;
         lb_params.Crossover = 0;
@@ -183,10 +190,7 @@ while rprice_ub - rprice_lb > options.tol
             lb_obj = -inf;
         end
         
-        % make the update a bit conservative to prevent the inaccuracy in
-        % the LP solution from plaging the correctness of the algorithm
         rprice_lb = max(rprice_cut, lb_obj - 2 * options.tol);
-        
         if all(abs(lb_output.pi(1:2 * coef_num)) < 1e-9)
             measure_opt = -lb_output.pi(2 * coef_num + 1:end);
             x_opt = x_agg(:, active_list);
@@ -219,7 +223,7 @@ while rprice_ub - rprice_lb > options.tol
     param = port2cpwl(port, wvec);
     [cparam, A, b] = cpwl2concmin(param);
     
-    [model, params] = concmin2gurobi(cparam, A, b, 100, true);
+    [model, params] = concmin2gurobi(cparam, A, b, options.x_ub, true);
     params.MIPFocus = 3;
     params.MIPGap = options.milp_gap;
     params.MIPGapAbs = options.tol * 0.5;

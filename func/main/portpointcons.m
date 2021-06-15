@@ -7,8 +7,7 @@ function cons_C = portpointcons(port, x)
 % Outputs:
 %       cons_C: inequality constraints C * w <= 0
 
-% preprocess x to remove very small entries to improve the numerical
-% condition subsequent LP problems
+% preprocess x to remove very small entries
 x(x < 0) = 0;
 x = round(x, 4); 
 
@@ -35,8 +34,6 @@ if isfield(port, 'gen')
     cons_C = cons_C + gen_X' * port.gen.C;
 end
 
-% round off very small entries in the coefficients to improve the numerical
-% condition of subsequent LP problems
 cons_C = sparse(round(cons_C, 4));
 
 end

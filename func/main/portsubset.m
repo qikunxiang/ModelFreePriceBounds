@@ -38,5 +38,26 @@ if isfield(port, 'gen')
     [~, ~, sub.gen.grp] = unique(port.gen.grp(gen_rel_list));
 end
 
+if isfield(port, 'log')
+    log_C = port.log.C(:, list);
+    
+    % list of log that are still relevant
+    log_rel_list = ~all(log_C == 0, 2);
+    sub.log = struct;
+    sub.log.A = port.log.A(log_rel_list, :);
+    sub.log.C = log_C(log_rel_list, :);
+end
+
+if isfield(port, 'pow')
+    pow_C = port.pow.C(:, list);
+    
+    % list of pow that are still relevant
+    pow_rel_list = ~all(pow_C == 0, 2);
+    sub.pow = struct;
+    sub.pow.A = port.pow.A(pow_rel_list, :);
+    sub.pow.p = port.pow.p(pow_rel_list);
+    sub.pow.C = pow_C(pow_rel_list, :);
+end
+
 end
 

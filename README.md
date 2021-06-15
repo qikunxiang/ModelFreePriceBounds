@@ -2,8 +2,11 @@
 
 + By Ariel Neufeld, Antonis Papapantoleon and Qikun Xiang
 + Article link (arXiV): https://arxiv.org/abs/2006.14288
++ A supplementary document explaining how the market prices are repaired to remove arbitrage opportunities can be found in the depository with name Supplementary.pdf
 
 # Description of files
+
++ Supplementary.pdf:  A supplementary document explaining how the arbitrage opportunities are removed from market data
 
 + func/main/      contains the core functions  
     - portcreate.m:                    function to create a portfolio structure from the specification of tranded and non-traded derivatives  
@@ -18,14 +21,15 @@
     - weightcollapse.m:                utility function to transform the weights specified by the positive and negative parts into a single vector
     - weightexpand.m:                  utility function to transform the weights specified by a single vector into its positive and negative parts
     - weightmodify.m:                  utility function to transform two arbitrary non-negative vectors into weights specified by the positive and negative parts
+    - optionpricesanitize.m:			  function to modify bid and ask prices of options to remove arbitrage opportunities
 
 + func/LSIP/      contains the implementation of the ECP algorithm and the ACCP algorithm
-    - lsipecpalgo_gurobi.m:            the implementation of the ECP algorithm
-    - lsipaccpalgo_gurobi.m:           the implementation of the ACCP algorithm
+    - lsipecpalgo\_gurobi.m:            the implementation of the ECP algorithm
+    - lsipaccpalgo\_gurobi.m:           the implementation of the ACCP algorithm
     - polytopecenterempty_gurobi.m:    the subroutine to determine whether a polytope is empty and its Chebyshev center
 
 + func/sim/       contains functions related to simulating option prices for the experiments
-    - lognormoptprice.m:               the subroutine to compute the price of vanilla call and put options under a log-normal distribution
+    - lognorm_partialexp.m:               a subroutine used to compute the price of vanilla call and put options under a (truncated) log-normal distribution
     - simoptprice.m:                   used for computing the prices of all options via analytic expressions and Monte Carlo integration
     - roundprice.m:                    used for rounding the bid and ask prices 
     - nonreplprice.m:                  a utility function used for structuring the prices
@@ -33,7 +37,7 @@
 + exp/            contains the scripts to run the experiments (see later)
 
 + utils/          contains external libraries
-    - utils/tight_subplot/:             used for creating figures with narrow margins
+    - utils/tight\_subplot/:             used for creating figures with narrow margins
 
 # Instruction to run the experiments
 
@@ -45,48 +49,38 @@
 
 ## Experiment 1
 
-+ Run exp/exp1/exp1_gen.m to generate the data file.
-+ The ECP algorithm:
-    - Run exp/exp1/ecp/exp1_ecp_all.m to generate output files.
-    - Run exp/exp1/ecp/exp1_ecp_plot.m to plot the output.
-+ The ACCP algorithm:
-    - Run exp/exp1/accp/exp1_accp_all.m to generate output files.
-    - Run exp/exp1/accp/exp1_accp_plot.m to plot the output.
-+ Run exp/exp1/exp1_examine.m to compare the output of two algorithms. 
++ Run exp/exp1/exp1\_gen.m to generate the data file.
++ Run exp/exp1/exp1\_ecp\_all.m to generate output files from the ECP algorithm.
++ Run exp/exp1/exp1\_accp\_all.m to generate output files from the ACCP algorithm.
++ Run exp/exp1/exp1\_examine.m to compare the output of two algorithms. 
++ Run exp/exp1/exp1\_plot.m to plot the results.
 
 
 ## Experiment 2
 
-+ Run exp/exp2/exp2_gen.m to generate the data file.
-+ The ECP algorithm:
-    - Run exp/exp2/ecp/exp2_ecp_all.m to generate output files.
-    - Run exp/exp2/ecp/exp2_ecp_plot.m to plot the output.
-+ The ACCP algorithm:
-    - Run exp/exp2/accp/exp2_accp_all.m to generate output files.
-    - Run exp/exp2/accp/exp2_accp_plot.m to plot the output.
-+ Run exp/exp2/exp2_examine.m to compare the output of two algorithms. 
++ Run exp/exp2/exp2\_gen.m to generate the data file.
++ Run exp/exp2/exp2\_ecp\_VBS.m and exp/exp2/exp2\_ecp\_VBSR.m to generate output files from the ECP algorithm.
++ Run exp/exp2/exp2\_accp\_VBS.m and exp/exp2/exp2\_accp\_VBSR.m to generate output files from the ACCP algorithm.
++ Run exp/exp2/exp2\_examine.m to compare the output of two algorithms.
++ Run exp/exp2/exp2\_plot.m to plot the results.
 
 
 ## Experiment 3
 
-+ Run exp/exp3/exp3_gen.m to generate the data file.
-+ The ECP algorithm:
-    - Run exp/exp3/ecp/exp3_ecp_set1.m and exp/exp3/ecp/exp3_ecp_set2.m to generate output files.
-    - Run exp/exp3/ecp/exp3_ecp_plot.m to plot the output.
-+ The ACCP algorithm:
-    - Run exp/exp3/accp/exp3_accp_set1.m and exp/exp3/accp/exp3_accp_set2.m to generate output files.
-    - Run exp/exp3/accp/exp3_accp_plot.m to plot the output.
-+ Run exp/exp3/exp3_examine.m to compare the output of two algorithms.
++ Run exp/exp3/exp3\_gen.m to generate the data file.
++ Run exp/exp3/accp/exp3\_accp\_step1.m to compute the model-free price bounds of the call-on-min option and the put-on-min option. The model-free price bounds of the call-on-min option are [0.000, 0.859], and the model-free price bounds of the put-on-min option are [2.218, 3.222]. 
++ Run exp/exp3/accp/exp3\_accp\_step2.m and view the output.
 
 
 ## Experiment 4
 
-+ Run exp/exp4/exp4_gen.m to generate the data file.
-+ Run exp/exp4/ecp/exp4_ecp.m to generate the output file.
-+ Run exp/exp4/ecp/exp4_ecp_plot.m to plot the output.
-
-
-## Experiment 5
-
-+ Run exp/exp5/exp5_gen.m to generate the data file (must run Experiment 2 first).
-+ Run exp/exp5/accp/exp5_accp_set1.m and exp/exp5/accp/exp5_accp_set2.m to view the output.
++ Run exp/exp4/sanitize/exp\_DIA\_before\_sanitize\_gen.m to generate data files for identifying arbitrage opportunities. 
++ Run exp/exp4/sanitize/exp\_DIA\_before\_sanitize\_ecp.m to identify arbitrage opportunities. The result is contained in the output rst. One can see that arbitrage opportunities are present among the prices of options written on 5 of the 30 underlying stocks: CVX, IBM, MMM, VZ, and WMT. 
++ Run exp/exp4/sanitize/exp\_DIA\_sanitize.m to adjust the bid and ask prices to remove arbitrage opportunities and generate a new data file containing the modified prices. 
++ Run exp/exp4/sanitize/exp\_DIA\_after\_sanitize\_gen.m to generate data files for identifying arbitrage opportunities among the adjusted prices. 
++ Run exp/exp4/sanitize/exp\_DIA\_after\_sanitize\_ecp.m to identify arbitrage opportunities among the adjusted prices. The result is contained in the output rst. One can see that no arbitrage opportunity is identified since all entries of rst are 0. 
++ Run exp/exp4/exp\_DIA\_plot\_bidask.m to plot some samples of option prices. 
++ Run exp/exp4/exp\_DIA\_gen\_inc.m and exp/exp4/exp\_DIA\_gen\_sel.m to generate all data files used for computing the model-free price bounds. 
++ Run exp/exp4/exp\_DIA\_ecp\_V25.m, exp/exp4/exp\_DIA\_ecp\_V50.m, exp/exp4/exp\_DIA\_ecp\_V75.m, exp/exp4/exp\_DIA\_ecp\_V100.m, and exp/exp4/exp\_DIA\_ecp\_V100B.m in succession to generate output files for the first five cases. 
++ Run exp/exp4/exp\_DIA\_ecp\_V25prox.m and exp/exp4/exp\_DIA\_ecp\_V25proxB.m in succession to generate output files for the last two cases. 
++ Run exp/exp4/exp\_DIA\_print.m to print the results. 

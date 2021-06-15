@@ -1,10 +1,12 @@
-load('exp/exp2/exp2.mat');
+load('exp/exp1/exp1.mat');
 
 [port, portlim] = portcreate(conf);
 
 compute_time = 0;
 
-for setting = 4:-1:1
+setting_names = {'V', 'V+B', 'V+B+S', 'V+B+S+R'};
+
+for setting = 1:4
 
 out_bounds = zeros(51, 2);
 out_bounds_o = zeros(51, 2);
@@ -14,13 +16,13 @@ iterations = zeros(51, 2);
 outputs = cell(51, 2);
 
 if setting == 1
-    prevfile = load('exp/exp2/rst/ecp_set2.mat');
-elseif setting == 2
-    prevfile = load('exp/exp2/rst/ecp_set3.mat');
-elseif setting == 3
-    prevfile = load('exp/exp2/rst/ecp_set4.mat');
-else
     clear prevfile;
+elseif setting == 2
+    prevfile = load('exp/exp1/rst/ecp_V.mat');
+elseif setting == 3
+    prevfile = load('exp/exp1/rst/ecp_V+B.mat');
+else
+    prevfile = load('exp/exp1/rst/ecp_V+B+S.mat');
 end
 
 tic;
@@ -30,22 +32,23 @@ for id = 1:51
         subset_list = true(port.m, 1);
         
         if setting == 1
-            % setting 1: vanilla + basket + spread + rainbow
-            subset_list(441:491) = false;
-            repl = [false(440, 1); true;];
-        elseif setting == 2
-            % setting 2: vanilla + basket + spread
-            subset_list(375:491) = false;
-            repl = [false(374, 1); true];
-        elseif setting == 3
-            % setting 3: vanilla + basket
-            subset_list(177:491) = false;
-            repl = [false(176, 1); true];
-        else
-            % setting 4: vanilla
+            % setting 1: vanilla
             subset_list(57:491) = false;
             repl = [false(56, 1); true];
+        elseif setting == 2
+            % setting 2: vanilla + basket
+            subset_list(177:491) = false;
+            repl = [false(176, 1); true];
+        elseif setting == 3
+            % setting 3: vanilla + basket + spread
+            subset_list(375:491) = false;
+            repl = [false(374, 1); true];
+        else
+            % setting 4: vanilla + basket + spread + rainbow
+            subset_list(441:491) = false;
+            repl = [false(440, 1); true;];
         end
+        
         subset_list(440 + id) = true;
         subport = portsubset(port, subset_list);
         subportlim = portsubset(portlim, subset_list);
@@ -62,7 +65,7 @@ for id = 1:51
 
         
         options = struct('tol', 1e-3, 'drop_thres', 1, ...
-            'init_rprice_lb', init_lb);
+            'init_rprice_lb', init_lb, 'display', false);
         if id > 1
             options.init_x = x_cell{id - 1, lu};
             if lu == 1
@@ -97,6 +100,6 @@ for id = 1:51
 end
 compute_time = compute_time + toc;
 
-save(sprintf('exp/exp2/rst/ecp_set%d.mat', setting));
+save(sprintf('exp/exp1/rst/ecp_%s.mat', setting_names{setting}));
 
 end

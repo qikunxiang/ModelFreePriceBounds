@@ -1,4 +1,5 @@
-function [price_bounds, price_all] = simoptprice(conf, sim_num, marg, dep)
+function [price_bounds, price_all] = simoptprice(conf, sim_num, ...
+    marg, dep, ub)
 % Simulate various option prices under a list of candidate models in which 
 % the marginal distributions are log-normal and the dependence structure 
 % is t-copula
@@ -7,10 +8,15 @@ function [price_bounds, price_all] = simoptprice(conf, sim_num, marg, dep)
 %       sim_num: number of random simulations to perform
 %       marg: cell array containing marginal information
 %       dep: cell array containiing dependence information
+%       ub: upper bound on the support of the measure (default is inf)
 % Outputs:
 %       price_bounds: matrix with 2 columns where column 1 represents upper
 %           bounds and column 2 represents lower bounds
 %       price_all: prices under all models
+
+if ~exist('ub', 'var') || isempty(ub)
+    ub = inf(conf.n, 1);
+end
 
 price_all = struct;
 
@@ -20,7 +26,8 @@ dep_num = length(dep);
 % compute the forward prices and vanilla option prices
 forward_mat = zeros(conf.n, marg_num);
 for i = 1:marg_num
-    forward_mat(:, i) = exp(marg{i}.mu + 0.5 * marg{i}.sig2);
+    forward_mat(:, i) = lognorm_partialexp(marg{i}.mu, marg{i}.sig2, ...
+        0, ub(i), 1, 0);
 end
 forward_prices = [max(forward_mat, [], 2), min(forward_mat, [], 2)];
 price_all.forward = forward_mat;
@@ -31,8 +38,8 @@ if isfield(conf, 'call')
     for i = 1:conf.n
         call_n_mat = zeros(length(conf.call{i}), marg_num);
         for j = 1:marg_num
-            call_n_mat(:, j) = lognormoptprice(marg{j}.mu(i), ...
-                marg{j}.sig2(i), conf.call{i}, 'call');
+            call_n_mat(:, j) = lognorm_partialexp(marg{j}.mu(i), ...
+                marg{j}.sig2(i), conf.call{i}, ub(i), 1, -conf.call{i});
         end
         call_cell{i} = [max(call_n_mat, [], 2), min(call_n_mat, [], 2)];
         call_all_cell{i} = call_n_mat;
@@ -49,8 +56,9 @@ if isfield(conf, 'put')
     for i = 1:conf.n
         put_n_mat = zeros(length(conf.put{i}), marg_num);
         for j = 1:marg_num
-            put_n_mat(:, j) = lognormoptprice(marg{j}.mu(i), ...
-                marg{j}.sig2(i), conf.put{i}, 'put');
+            put_n_mat(:, j) = lognorm_partialexp(marg{j}.mu(i), ...
+                marg{j}.sig2(i), 0, min(conf.put{i}, ub(i)), ...
+                -1, conf.put{i});
         end
         put_cell{i} = [max(put_n_mat, [], 2), min(put_n_mat, [], 2)];
         put_all_cell{i} = put_n_mat;
@@ -80,10 +88,13 @@ if exist('dep', 'var') && (isfield(conf, 'cbask') ...
     X_cell = cell(sce_num, 1);
     for i = 1:dep_num
         for j = 1:marg_num
+            norm_const = normcdf((log(ub) - marg{j}.mu) ...
+                ./ sqrt(marg{j}.sig2));
+            
             X = c_cell{i};
             for k = 1:conf.n
-                X(:, k) = logninv(X(:, k), marg{j}.mu(k), ...
-                    sqrt(marg{j}.sig2(k)));
+                X(:, k) = logninv(X(:, k) * norm_const(k), ...
+                    marg{j}.mu(k), sqrt(marg{j}.sig2(k)));
             end
             X_cell{(i - 1) * marg_num + j} = X;
         end
@@ -243,7 +254,7 @@ if exist('dep', 'var') && (isfield(conf, 'cbask') ...
     end
     
     if isfield(conf, 'boc')
-        boc_num = length(conf.boc.k);
+        boc_num = length(conf.boc.L);
         boc_cell = cell(boc_num, 1);
         boc_all_cell = cell(boc_num, 1);
         
@@ -255,7 +266,7 @@ if exist('dep', 'var') && (isfield(conf, 'cbask') ...
                 for k = 1:stk_num
                     X = X_cell{j};
                     boc_mat(k, j) = mean(max(max( ...
-                        X(:, conf.boc.L(i, :) ~= 0) ...
+                        X * conf.boc.L{i}' ...
                         - conf.boc.k{i}(k, :), [], 2), 0), 1);
                 end
             end

@@ -1,4 +1,4 @@
-load('exp/exp3/exp3.mat');
+load('exp/exp2/exp2.mat');
 
 [port, ~] = portcreate(conf);
 
@@ -18,8 +18,8 @@ for id = 1:strike_num
         % the list of relevant instruments
         subset_list = true(port.m, 1);
         
-        subset_list(392:412) = false;
-        repl = [false(391, 1); true];
+        subset_list(402:412) = false;
+        repl = [false(401, 1); true];
         
         subset_list(401 + id) = true;
         subport = portsubset(port, subset_list);
@@ -68,5 +68,4 @@ for id = 1:strike_num
 end
 compute_time = toc;
 
-
-save('exp/exp3/rst/ecp_set1.mat');
+save('exp/exp2/rst/ecp_V+B+S+R.mat');
