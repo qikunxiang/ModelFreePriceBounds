@@ -132,6 +132,8 @@ lp_params.OptimalityTol = 1e-5;
 
 % start with barrier method, later may switch to dual simplex method
 lp_params.Method = 2;
+lp_params.Crossover = 0;
+lp_params.BarHomogeneous = 1;
 
 if options.display
     lp_params.OutputFlag = 1;
@@ -153,24 +155,32 @@ if isfield(options, 'init_x')
     x_agg = options.init_x;
 end
 
-lp_output = gurobi(lp_model, lp_params);
+lp_init_params = lp_params;
+lp_init_params.Method = 1;
+lp_output = gurobi(lp_model, lp_init_params);
 
-if strcmp(lp_output.status, 'INFEASIBLE') ...
-        || strcmp(lp_output.status, 'INF_OR_UNBD') ...
-        || strcmp(lp_output.status, 'UNBOUNDED') ...
-        || strcmp(lp_output.status, 'NUMERIC') ...
-        || strcmp(lp_output.status, 'SUBOPTIMAL')
+if ~strcmp(lp_output.status, 'OPTIMAL')
     warning('error in the initial LP, status = %s', lp_output.status);
     
     % try again with better numeric focus
-    lp_params_num = lp_params;
+    lp_params_num = lp_init_params;
     lp_params_num.NumericFocus = 3;
     lp_output = gurobi(lp_model, lp_params_num);
-    if ~strcmp(lp_output.status, 'OPTIMAL')
-        error('unexpected error in the initial LP, status = %s', ...
-            lp_output.status);
-    end
-elseif ~strcmp(lp_output.status, 'OPTIMAL')
+end
+
+if ~strcmp(lp_output.status, 'OPTIMAL')
+    warning('error in the initial LP (2nd trial), status = %s', ...
+        lp_output.status);
+    
+    % try again with barrier and crossover
+    lp_params_num = lp_init_params;
+    lp_params_num.NumericFocus = 3;
+    lp_params_num.Method = 2;
+    lp_params_num.Crossover = -1;
+    lp_output = gurobi(lp_model, lp_params_num);
+end
+
+if ~strcmp(lp_output.status, 'OPTIMAL')
     error('unexpected error in the initial LP, status = %s', ...
         lp_output.status);
 end
@@ -192,7 +202,6 @@ lp_count = 1;
 milp_count = 0;
 
 while true
-    fprintf('#################### iter %4d ####################\n', iter);
     param = port2cpwl(port, weight_vec);
     [cparam, A, b] = cpwl2concmin(param);
     
@@ -260,32 +269,39 @@ while true
     
     lp_output = gurobi(lp_model, lp_params);
     
-    if strcmp(lp_output.status, 'INFEASIBLE') ...
-            || strcmp(lp_output.status, 'INF_OR_UNBD') ...
-            || strcmp(lp_output.status, 'UNBOUNDED') ...
-            || strcmp(lp_output.status, 'NUMERIC') ...
-            || strcmp(lp_output.status, 'SUBOPTIMAL')
+    if ~strcmp(lp_output.status, 'OPTIMAL')
         warning('error in the LP, status = %s', lp_output.status);
         
         % try again with better numeric focus
         lp_params_num = lp_params;
         lp_params_num.NumericFocus = 3;
         lp_output = gurobi(lp_model, lp_params_num);
-        if strcmp(lp_output.status, 'INFEASIBLE') ...
-                || strcmp(lp_output.status, 'INF_OR_UNBD') ...
-                || strcmp(lp_output.status, 'UNBOUNDED') ...
-                || strcmp(lp_output.status, 'NUMERIC') ...
-                || strcmp(lp_output.status, 'SUBOPTIMAL')
-            warning('error in the LP (2nd trial), status = %s', ...
-                lp_output.status);
-            
-            % disable crossover and try again
-            lp_params_num = lp_params;
-            lp_params_num.NumericFocus = 3;
-            lp_params_num.Crossover = 0;
-            lp_output = gurobi(lp_model, lp_params_num);
-        end
-    elseif ~strcmp(lp_output.status, 'OPTIMAL')
+    end
+
+    if ~strcmp(lp_output.status, 'OPTIMAL')
+        warning('error in the LP (2nd trial), status = %s', ...
+            lp_output.status);
+
+        % switch to dual simplex and try again
+        lp_params_num = lp_params;
+        lp_params_num.NumericFocus = 3;
+        lp_params_num.Method = 1;
+        lp_output = gurobi(lp_model, lp_params_num);
+    end
+
+    if ~strcmp(lp_output.status, 'OPTIMAL')
+        warning('error in the LP (3nd trial), status = %s', ...
+            lp_output.status);
+
+        % switch back to barrier with crossover and try again
+        lp_params_num = lp_params;
+        lp_params_num.NumericFocus = 3;
+        lp_params_num.Method = 2;
+        lp_params_num.Crossover = -1;
+        lp_output = gurobi(lp_model, lp_params_num);
+    end
+
+    if ~strcmp(lp_output.status, 'OPTIMAL')
         error('unexpected error in the LP, status = %s', ...
             lp_output.status);
     end
@@ -303,6 +319,8 @@ while true
     end
     
     iter = iter + 1;
+
+    fprintf('iter = %4d, LB = %10.6f\n', iter, rprice_lb);
 end
 
 % prepare output

@@ -29,3 +29,5 @@ for i = 1:length(list)
 
     fprintf('upper bound = %.3f\n', rprice);
 end
+
+% results are contained in rst

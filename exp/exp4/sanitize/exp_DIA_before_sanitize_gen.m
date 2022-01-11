@@ -1,6 +1,6 @@
 load('exp/exp4/DIA.mat');
 
-% check the basket options
+% check the options written on DIA
 
 conf = struct;
 conf.n = 1;
@@ -18,7 +18,7 @@ price_bounds = [1, 1; call_prices; put_prices];
 
 save('exp/exp4/sanitize/before_sanitize_DIA.mat', 'conf', 'price_bounds');
 
-% check the vanilla options
+% check the stock options
 
 for i = 1:30
     conf = struct;

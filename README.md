@@ -1,12 +1,9 @@
 # Model-free bounds for multi-asset options using option-implied information and their exact computation
 
-+ By Ariel Neufeld, Antonis Papapantoleon and Qikun Xiang
++ By Ariel Neufeld, Antonis Papapantoleon, and Qikun Xiang
 + Article link (arXiV): https://arxiv.org/abs/2006.14288
-+ A supplementary document explaining how the market prices are repaired to remove arbitrage opportunities can be found in the depository with name Supplementary.pdf
 
 # Description of files
-
-+ Supplementary.pdf:  A supplementary document explaining how the arbitrage opportunities are removed from market data
 
 + func/main/      contains the core functions  
     - portcreate.m:                    function to create a portfolio structure from the specification of tranded and non-traded derivatives  
@@ -34,7 +31,11 @@
     - roundprice.m:                    used for rounding the bid and ask prices 
     - nonreplprice.m:                  a utility function used for structuring the prices
 
-+ exp/            contains the scripts to run the experiments (see later)
++ exp/            contains the scripts to run the experiments (see below)
+
++ data/			 contains the data file as well as a preprocessing script to generate a .mat file used in the real data experiment
+	 - data/Data\_clean\_bid\_ask\_only.xlsx: Excel spreadsheet containing market prices of call and put options retrieved from https://www.marketwatch.com on 6 April, 2021
+	 - data/data\_preprocess.m: a script that reads from data/Data\_clean\_bid\_ask\_only.xlsx and stores all data into a .mat file for the real data experiment
 
 + utils/          contains external libraries
     - utils/tight\_subplot/:             used for creating figures with narrow margins
@@ -43,7 +44,7 @@
 
 ## Configurations
 
-+ All folders and subfolders must be added to the search path. 
++ All folders and subfolders must be added to the MATLAB search path. 
 + Gurobi optimization must be installed on the machine and relevant files must be added to the search path. 
 
 
@@ -74,13 +75,23 @@
 
 ## Experiment 4
 
+### Step 0: generate the .mat input file.
++ Run data/data\_preprocess.m to generate a file exp/exp4/DIA.mat, which will be used in subsequent steps of the experiment.
+
+### Step 1: examine the option prices to identify arbitrage opportunities. 
 + Run exp/exp4/sanitize/exp\_DIA\_before\_sanitize\_gen.m to generate data files for identifying arbitrage opportunities. 
 + Run exp/exp4/sanitize/exp\_DIA\_before\_sanitize\_ecp.m to identify arbitrage opportunities. The result is contained in the output rst. One can see that arbitrage opportunities are present among the prices of options written on 5 of the 30 underlying stocks: CVX, IBM, MMM, VZ, and WMT. 
-+ Run exp/exp4/sanitize/exp\_DIA\_sanitize.m to adjust the bid and ask prices to remove arbitrage opportunities and generate a new data file containing the modified prices. 
+
+### Step 2: remove outliers and adjust the options prices to remove arbitrage opportunities.
++ Run exp/exp4/sanitize/exp\_DIA\_sanitize.m to adjust the bid and ask prices to remove arbitrage opportunities and generate a new data file containing the modified prices. This script also removes the call and put options written on CVX with strikes below $50 since their prices are anomalous. Please refer to Figure EC.1 in the paper. 
++ Run exp/exp4/exp\_DIA\_plot\_bidask.m to plot some samples of option prices. This script also counts the number of option prices modified as a result of exp/exp4/sanitize/exp\_DIA\_sanitize.m.
+
+### Step 3: re-examine the option prices to confirm that all arbitrage opportunities have been removed.
 + Run exp/exp4/sanitize/exp\_DIA\_after\_sanitize\_gen.m to generate data files for identifying arbitrage opportunities among the adjusted prices. 
-+ Run exp/exp4/sanitize/exp\_DIA\_after\_sanitize\_ecp.m to identify arbitrage opportunities among the adjusted prices. The result is contained in the output rst. One can see that no arbitrage opportunity is identified since all entries of rst are 0. 
-+ Run exp/exp4/exp\_DIA\_plot\_bidask.m to plot some samples of option prices. 
-+ Run exp/exp4/exp\_DIA\_gen\_inc.m and exp/exp4/exp\_DIA\_gen\_sel.m to generate all data files used for computing the model-free price bounds. 
-+ Run exp/exp4/exp\_DIA\_ecp\_V25.m, exp/exp4/exp\_DIA\_ecp\_V50.m, exp/exp4/exp\_DIA\_ecp\_V75.m, exp/exp4/exp\_DIA\_ecp\_V100.m, and exp/exp4/exp\_DIA\_ecp\_V100B.m in succession to generate output files for the first five cases. 
-+ Run exp/exp4/exp\_DIA\_ecp\_V25prox.m and exp/exp4/exp\_DIA\_ecp\_V25proxB.m in succession to generate output files for the last two cases. 
-+ Run exp/exp4/exp\_DIA\_print.m to print the results. 
++ Run exp/exp4/sanitize/exp\_DIA\_after\_sanitize\_ecp.m to identify arbitrage opportunities among the adjusted prices. The result is contained in the output rst. One can see that no arbitrage opportunity is identified since all entries of rst are 0 (up to small numerical errors).  
+
+### Step 4: use the option prices to compute model-free price bounds for two basket call options.
++ Run exp/exp4/exp\_DIA\_gen1.m and exp/exp4/exp\_DIA\_gen2.m to generate data files used for computing the model-free price bounds for two basket call options. 
++ Run exp/exp4/exp\_DIA2\_ecp\_V25.m, exp/exp4/exp\_DIA2\_ecp\_V50.m, exp/exp4/exp\_DIA2\_ecp\_V100.m, and exp/exp4/exp\_DIA2\_ecp\_V100B.m in succession to generate output files containing the model-free price bounds for the second basket call option. 
++ Run exp/exp4/exp\_DIA1\_ecp\_V25.m, exp/exp4/exp\_DIA1\_ecp\_V50.m, exp/exp4/exp\_DIA1\_ecp\_V100.m, and exp/exp4/exp\_DIA1\_ecp\_V100B.m in succession to generate output files containing the model-free price bounds for the first basket call option. 
++ Run exp/exp4/exp\_DIA\_plot\_results.m to plot the results. 

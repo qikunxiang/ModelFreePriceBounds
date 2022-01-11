@@ -2,6 +2,7 @@ load('exp/exp4/DIA.mat');
 
 san = load('exp/exp4/DIA_sanitized.mat');
 
+% count the number of modified prices
 mod_count = zeros(31, 1);
 mod_count(1) = sum(sum(san.DIA_call_modify ~= 0)) ...
     + sum(sum(san.DIA_put_modify ~= 0));
